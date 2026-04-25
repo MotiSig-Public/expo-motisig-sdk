@@ -1,0 +1,77 @@
+{
+  "name": "@motisig/expo-motisig-sdk",
+  "version": "0.1.0",
+  "description": "Official MotiSig AI SDK for Expo and React Native (TypeScript, expo-notifications)",
+  "keywords": [
+    "expo-push-notification",
+    "motisig",
+    "expo-in-app-messages",
+    "expo",
+    "react-native",
+    "expo-notifications",
+    "push-notifications"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./app.plugin": "./app.plugin.js",
+    "./app.plugin.js": "./app.plugin.js",
+    "./plugin/withMotisig": {
+      "types": "./plugin/withMotisig.d.ts",
+      "default": "./plugin/withMotisig.js"
+    }
+  },
+  "files": [
+    "dist",
+    "plugin",
+    "native",
+    "app.plugin.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepare": "tsc",
+    "example:start": "pnpm --filter motisig-expo-example start"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MotiSig-Public/expo-motisig-sdk.git"
+  },
+  "peerDependencies": {
+    "@expo/config-plugins": ">=8.0.0",
+    "expo": ">=51.0.0",
+    "expo-constants": "*",
+    "expo-device": "*",
+    "expo-notifications": "*",
+    "react-native": ">=0.74.0"
+  },
+  "peerDependenciesMeta": {
+    "@expo/config-plugins": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "expo-notification-service-extension-plugin": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0",
+    "expo": "~54.0.33",
+    "expo-constants": "~18.0.12",
+    "expo-device": "~8.0.10",
+    "expo-notifications": "~0.32.16",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "typescript": "~5.9.2"
+  }
+}
