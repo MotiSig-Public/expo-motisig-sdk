@@ -44,6 +44,10 @@
     "example:start": "pnpm --filter motisig-expo-example start"
   },
   "license": "MIT",
+  "homepage": "https://motisig.ai/docs/sdks/expo",
+  "bugs": {
+    "url": "https://github.com/MotiSig-Public/expo-motisig-sdk/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/MotiSig-Public/expo-motisig-sdk.git"

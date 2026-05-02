@@ -93,23 +93,25 @@ Override the bundled NSE with `nse.iosNSEFilePath` if you need custom logic. Set
 
 On Android, FCM auto-renders the image when the push is sent as a `notification` message with `notification.image` — no extra setup.
 
-Full Xcode-free walkthrough, plugin config, payload contract, and troubleshooting: **[docs/RICH_IMAGES.md](docs/RICH_IMAGES.md)**.
+Full Xcode-free walkthrough, plugin config, payload contract, and troubleshooting: **[Rich notification images (docs)](https://motisig.ai/docs/sdks/expo/rich-images)**.
 
 Don't forget `Notifications.setNotificationHandler({...})` so foreground banners actually appear; the example app at [`examples/motisig-expo-example`](examples/motisig-expo-example) wires it all up.
 
 ## Documentation
 
+Authoritative guides live on **[MotiSig AI — Expo & React Native](https://motisig.ai/docs/sdks/expo)**. The `docs/*.md` files in this repository are short pointers for backwards compatibility.
+
 | Guide | Description |
 |-------|-------------|
-| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | Lifecycle, foreground handler, ordered mutations |
-| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Init options, base URL, EAS project id, env vars |
-| [docs/USER_PROFILE.md](docs/USER_PROFILE.md) | `setUser`, `updateUser`, `logout`, `reset` |
-| [docs/EVENTS_TAGS_ATTRIBUTES.md](docs/EVENTS_TAGS_ATTRIBUTES.md) | Tags, attributes, `ping`, `triggerEvent`, click tracking |
-| [docs/PUSH_NOTIFICATIONS.md](docs/PUSH_NOTIFICATIONS.md) | Expo push tokens, listeners, permissions |
-| [docs/RICH_IMAGES.md](docs/RICH_IMAGES.md) | iOS NSE setup, payload contract, Android notes |
-| [docs/PRIVACY_AND_DATA.md](docs/PRIVACY_AND_DATA.md) | Data categories for your privacy disclosures |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Symptom-driven debugging checklist |
-| [docs/VERSIONING.md](docs/VERSIONING.md) | Versioning policy and the canonical push payload contract |
+| [Getting started](https://motisig.ai/docs/sdks/expo/getting-started) | Lifecycle, foreground handler, ordered mutations |
+| [Configuration](https://motisig.ai/docs/sdks/expo/configuration) | Init options, base URL, EAS project id, env vars |
+| [User and profile](https://motisig.ai/docs/sdks/expo/user-profile) | `setUser`, `updateUser`, `logout`, `reset` |
+| [Events, tags, attributes](https://motisig.ai/docs/sdks/expo/events-tags-attributes) | Tags, attributes, `ping`, `triggerEvent`, click tracking |
+| [Push notifications](https://motisig.ai/docs/sdks/expo/push-notifications) | Expo push tokens, listeners, permissions |
+| [Rich images](https://motisig.ai/docs/sdks/expo/rich-images) | iOS NSE setup, payload contract, Android notes |
+| [Privacy and data](https://motisig.ai/docs/sdks/expo/privacy-and-data) | Data categories for your privacy disclosures |
+| [Troubleshooting](https://motisig.ai/docs/sdks/expo/troubleshooting) | Symptom-driven debugging checklist |
+| [Versioning](https://motisig.ai/docs/sdks/expo/versioning) | Versioning policy and the canonical push payload contract |
 
 ## Example
 
