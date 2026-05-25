@@ -97,6 +97,13 @@ Full Xcode-free walkthrough, plugin config, payload contract, and troubleshootin
 
 Don't forget `Notifications.setNotificationHandler({...})` so foreground banners actually appear; the example app at [`examples/motisig-expo-example`](examples/motisig-expo-example) wires it all up.
 
+## Reliability
+
+Notification opens and `trackClick` calls are queued on disk when **`@react-native-async-storage/async-storage`** is installed (otherwise an in-memory fallback is used for the current session). The SDK retries failed `POST /track/click` requests with exponential backoff for transient errors (network failure, **408**, **429**, and **5xx**), up to 50 attempts by default. Non-retryable **4xx** responses are dropped with a warning.
+
+The last `setUser` id is persisted so cold-start notification handling can attach clicks after relaunch. **`logout()`** clears the persisted user id and empties the pending click queue and dedupe store for that install.
+
+
 ## Documentation
 
 Authoritative guides live on **[MotiSig AI — Expo & React Native](https://motisig.ai/docs/sdks/expo)**. The `docs/*.md` files in this repository are short pointers for backwards compatibility.

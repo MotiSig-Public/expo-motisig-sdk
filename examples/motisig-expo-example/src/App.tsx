@@ -26,7 +26,7 @@ export default function App() {
 
   useEffect(() => {
     if (!hasEnv) {
-      console.log('[MotiSigExample] missing env', {
+      console.warn('[MotiSigExample] missing env', {
         hasSdkKey: Boolean(SDK_KEY.trim()),
         hasProjectId: Boolean(PROJECT_ID.trim()),
       });
@@ -34,7 +34,7 @@ export default function App() {
       return;
     }
     const baseURL = (process.env.EXPO_PUBLIC_MOTISIG_BASE_URL ?? '').trim();
-    console.log('[MotiSigExample] MotiSig config', {
+    console.info('[MotiSigExample] MotiSig config', {
       projectId: PROJECT_ID,
       sdkKey: SDK_KEY,
       baseURL: baseURL.length > 0 ? baseURL : 'default',
@@ -45,16 +45,17 @@ export default function App() {
       const ok = await motiSig.initialize({
         sdkKey: SDK_KEY,
         projectId: PROJECT_ID,
+        logLevel: 'debug',
       });
       if (cancelled) return;
-      console.log('[MotiSigExample] MotiSig initialize', { ok });
+      console.info('[MotiSigExample] MotiSig initialize', { ok });
       if (ok) {
         try {
-          console.log('[MotiSigExample] setUser start', { userId: DEMO_USER_ID });
+          console.debug('[MotiSigExample] setUser start', { userId: DEMO_USER_ID });
           await motiSig.setUser(DEMO_USER_ID);
-          console.log('[MotiSigExample] setUser ok', { currentUserId: motiSig.currentUserId });
+          console.info('[MotiSigExample] setUser ok', { currentUserId: motiSig.currentUserId });
           const expoPushToken = await motiSig.getExpoPushToken();
-          console.log('[MotiSigExample] Expo push token (sent to MotiSig if non-null)', {
+          console.info('[MotiSigExample] Expo push token (sent to MotiSig if non-null)', {
             expoPushToken,
           });
         } catch (err) {
@@ -62,7 +63,7 @@ export default function App() {
           // still show inbox; pushes may be limited without user
         }
       } else {
-        console.log('[MotiSigExample] setUser skipped', { reason: 'initialize returned false' });
+        console.warn('[MotiSigExample] setUser skipped', { reason: 'initialize returned false' });
       }
       if (!cancelled) {
         setSdkReady(ok);

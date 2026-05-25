@@ -5,7 +5,9 @@ import { MotiSigApiError } from '../errors';
 import { MotiSigEmitter } from '../internal/emitter';
 import { AsyncQueue } from '../internal/asyncQueue';
 import { logger, setLogLevel } from '../internal/logger';
+import { ClickDispatcher } from '../internal/clickDispatcher';
 import { loadCustomerPushEnabled, persistCustomerPushEnabled } from '../internal/pushSubscriptionPrefs';
+import { clearPersistedUserId, loadPersistedUserId, persistUserId } from '../internal/userIdStore';
 import { getAppPlatform } from '../runtime/appPlatform';
 import { resolveClientBaseUrl } from '../runtime/resolveClientBaseUrl';
 import type {
@@ -66,6 +68,7 @@ export class MotiSig {
   private initialized = false;
   private listenersAttached = false;
   private readonly mutationQueue = new AsyncQueue();
+  private clickDispatcher: ClickDispatcher | null = null;
 
   private pushTokenSub: Subscription | null = null;
   private receivedSub: Subscription | null = null;
@@ -129,6 +132,18 @@ export class MotiSig {
       projectId,
     });
 
+    const persistedUserId = await loadPersistedUserId();
+    if (persistedUserId) {
+      this.userId = persistedUserId;
+    }
+
+    this.clickDispatcher = new ClickDispatcher({
+      apiProvider: () => this.api,
+      userIdProvider: () => this.userId,
+      clickRetry: options.clickRetry,
+    });
+    await this.clickDispatcher.start();
+
     this.customerPushEnabled = await loadCustomerPushEnabled();
 
     if (!options.skipPermissionRequest) {
@@ -156,6 +171,7 @@ export class MotiSig {
 
     this.appStateSub = AppState.addEventListener('change', (s) => {
       if (s === 'active') {
+        this.clickDispatcher?.kick();
         void this.syncPushSubscriptionPermissionFromForeground();
         this.tryPingIfReady();
         this.startForegroundPing();
@@ -236,6 +252,8 @@ export class MotiSig {
       if (priorUserId !== userId) {
         this.lastSyncedPermission = null;
       }
+      await persistUserId(userId);
+      await this.clickDispatcher?.onUserSet(userId);
       await this.syncExpoPushToken(api, userId);
     });
   }
@@ -258,6 +276,8 @@ export class MotiSig {
       }
       this.userId = null;
       this.lastSyncedPermission = null;
+      await this.clickDispatcher?.clearAll();
+      await clearPersistedUserId();
     });
   }
 
@@ -342,14 +362,12 @@ export class MotiSig {
     });
   }
 
-  trackClick(messageId: string, isForeground?: boolean): Promise<void> {
-    return this.mutationQueue.run(async () => {
-      const api = this.requireApi();
-      await api.trackClick({
-        userId: this.requireUserId(),
-        messageId,
-        isForeground,
-      });
+  async trackClick(messageId: string, isForeground?: boolean): Promise<void> {
+    this.requireApi();
+    await this.clickDispatcher?.enqueueClick({
+      messageId,
+      isForeground,
+      userId: this.userId ?? undefined,
     });
   }
 
@@ -362,6 +380,8 @@ export class MotiSig {
    * Removes listeners, clears local user state pointer (does not call server logout).
    */
   reset(): void {
+    this.clickDispatcher?.dispose();
+    this.clickDispatcher = null;
     this.detachNotificationListeners();
     this.stopForegroundPing();
     this.appStateSub?.remove();
@@ -560,6 +580,7 @@ export class MotiSig {
           enabled,
         });
         this.lastSyncedPermission = permission;
+        this.clickDispatcher?.kick();
       } catch (err) {
         logger.warn('token refresh: upsertPushSubscription failed', err);
       }
@@ -570,10 +591,11 @@ export class MotiSig {
 
   private processNotificationData(data: MotiSigNotificationPayload, isForeground: boolean): void {
     const messageId = getMessageId(data);
-    const userId = this.userId;
-    if (!messageId || !userId || !this.api) return;
-    void this.api.trackClick({ userId, messageId, isForeground }).catch((err) => {
-      logger.debug('trackClick failed', err);
+    if (!messageId || !this.clickDispatcher) return;
+    void this.clickDispatcher.enqueueClick({
+      messageId,
+      isForeground,
+      userId: this.userId ?? undefined,
     });
   }
 }

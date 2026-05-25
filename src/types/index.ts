@@ -74,6 +74,16 @@ export interface TrackClickPayload {
   isForeground?: boolean;
 }
 
+
+export interface MotiSigClickRetryOptions {
+  /** Maximum send attempts per queued click (default 50). */
+  maxAttempts?: number;
+  /** Base delay for exponential backoff in ms (default 1000). */
+  baseDelayMs?: number;
+  /** Maximum backoff delay in ms (default 60000). */
+  maxDelayMs?: number;
+}
+
 export interface MotiSigInitializeOptions {
   sdkKey: string;
   projectId: string;
@@ -95,6 +105,8 @@ export interface MotiSigInitializeOptions {
   pingIntervalSeconds?: number;
   /** Verbosity for the SDK's internal console logger. Default 'info'. */
   logLevel?: LogLevel;
+  /** Options for persisted click queue retries (exponential backoff). */
+  clickRetry?: MotiSigClickRetryOptions;
 }
 
 export type MotiSigNotificationPayload = Record<string, unknown> | undefined;
