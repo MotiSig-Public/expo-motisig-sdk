@@ -1,6 +1,6 @@
 {
   "name": "@motisig/expo-motisig-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official MotiSig AI SDK for Expo and React Native (TypeScript, expo-notifications)",
   "keywords": [
     "expo-push-notification",
