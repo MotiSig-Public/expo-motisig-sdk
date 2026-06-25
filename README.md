@@ -143,7 +143,7 @@ Output is CommonJS in `dist/` for broad React Native compatibility.
 
 ## Releasing
 
-Maintainers: see **[RELEASING.md](RELEASING.md)** for the full release checklist and `scripts/release.sh` helper. Copy [`.env.release.example`](.env.release.example) to gitignored `.env.release` with your `NPM_TOKEN` before publishing.
+Maintainers: see **[RELEASING.md](RELEASING.md)** for the full release checklist and `scripts/release.sh` helper. Publish with `npm login` or copy [`.env.release.example`](.env.release.example) to gitignored `.env.release` with an `NPM_TOKEN`.
 
 ## Source layout (`src/`)
 

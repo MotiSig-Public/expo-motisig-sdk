@@ -5,22 +5,38 @@ Maintainers only. This guide covers publishing the npm package to the public reg
 ## Prerequisites
 
 1. **npm account** with publish access to the `@motisig` scope.
-2. **npm access token** (Automation or Granular Access Token with publish permission).
+2. **npm credentials** — either an active `npm login` session (`~/.npmrc`) or an access token (Automation or Granular Access Token with publish permission).
 3. **pnpm** via Corepack (`corepack enable`).
 4. Git access to push commits and tags to this repository.
 
-## One-time credential setup
+## Credential setup
 
-Copy the release env template into a **gitignored** local file (never commit secrets):
+The release script picks credentials in this order:
+
+1. **`NPM_TOKEN`** from gitignored `.env.release` or the environment
+2. **`npm login`** — if `npm whoami` succeeds, publish uses your user `~/.npmrc` (same as manual `pnpm publish`)
+
+### Option A: npm login (simplest)
+
+```bash
+npm login
+npm whoami   # verify before releasing
+```
+
+### Option B: access token in `.env.release`
+
+Copy the template into a **gitignored** local file (never commit secrets):
 
 ```bash
 cp .env.release.example .env.release
 # Edit .env.release and set NPM_TOKEN=...
 ```
 
-If your npm account requires 2FA on publish, also set `NPM_OTP` in `.env.release` for the one-time password.
+When `NPM_TOKEN` is set, the script writes a **temporary** `.npmrc` for `pnpm publish` only — it is deleted immediately afterward.
 
-The release script writes a **temporary** `.npmrc` with the token only for the `pnpm publish` call — it is deleted immediately afterward.
+### 2FA on publish
+
+If your npm account requires 2FA when publishing, set `NPM_OTP` in `.env.release` (or export it) for the one-time password. This applies to both token and `npm login` auth.
 
 ## Release checklist
 

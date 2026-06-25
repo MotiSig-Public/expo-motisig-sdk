@@ -10,6 +10,7 @@ DRY_RUN=0
 SKIP_TESTS=0
 REMOTE="origin"
 TMP_NPMRC=""
+CRED_SOURCE=""
 
 cleanup() {
   if [ -n "$TMP_NPMRC" ] && [ -f "$TMP_NPMRC" ]; then
@@ -28,7 +29,9 @@ Full npm release:
   3. Run tests and build
   4. Commit, annotated tag, publish to npm, push
 
-Credentials are read from gitignored .env.release (see .env.release.example).
+Credentials (first match wins):
+  - NPM_TOKEN in gitignored .env.release or the environment
+  - npm login session in ~/.npmrc (npm whoami succeeds)
 EOF
   exit "${1:-0}"
 }
@@ -125,35 +128,53 @@ bump_package_version() {
   mv package.json.tmp package.json
 }
 
-load_release_env() {
+resolve_npm_credentials() {
   local file="$ROOT/.env.release"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    if [ -f "$file" ]; then
+
+  if [ -f "$file" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
       log "[dry-run] source .env.release (NPM_TOKEN and optional NPM_OTP)"
-    else
-      log "[dry-run] source .env.release (file not present; would be required for a real release)"
+    fi
+    set -a
+    # shellcheck disable=SC1090
+    . "$file"
+    set +a
+  fi
+
+  if [ -n "${NPM_TOKEN:-}" ]; then
+    CRED_SOURCE="token"
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log "[dry-run] npm auth: NPM_TOKEN from .env.release or environment"
     fi
     return 0
   fi
 
-  if [ ! -f "$file" ]; then
-    log "error: $file not found." >&2
-    log "Copy .env.release.example to .env.release and set NPM_TOKEN." >&2
-    exit 1
+  if [ "$DRY_RUN" -eq 1 ]; then
+    if npm whoami --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+      log "[dry-run] npm auth: npm login credentials (~/.npmrc)"
+    else
+      log "[dry-run] npm auth: none found (would fail; run npm login or set NPM_TOKEN)"
+    fi
+    return 0
   fi
 
-  set -a
-  # shellcheck disable=SC1090
-  . "$file"
-  set +a
-
-  if [ -z "${NPM_TOKEN:-}" ]; then
-    log "error: .env.release must set NPM_TOKEN." >&2
-    exit 1
+  if npm whoami --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+    CRED_SOURCE="npm-login"
+    log "Using npm login credentials (~/.npmrc)."
+    return 0
   fi
+
+  log "error: no npm publish credentials found." >&2
+  log "Run npm login, or copy .env.release.example to .env.release and set NPM_TOKEN." >&2
+  exit 1
 }
 
 publish_to_npm() {
+  publish_args="--no-git-checks"
+  if [ -n "${NPM_OTP:-}" ]; then
+    publish_args="$publish_args --otp $NPM_OTP"
+  fi
+
   if [ "$DRY_RUN" -eq 1 ]; then
     log "[dry-run] pnpm publish --no-git-checks"
     if [ -n "${NPM_OTP:-}" ]; then
@@ -162,16 +183,15 @@ publish_to_npm() {
     return 0
   fi
 
-  TMP_NPMRC="$(mktemp)"
-  printf '%s\n' "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$TMP_NPMRC"
-
-  publish_args="--no-git-checks"
-  if [ -n "${NPM_OTP:-}" ]; then
-    publish_args="$publish_args --otp $NPM_OTP"
+  if [ "$CRED_SOURCE" = "token" ]; then
+    TMP_NPMRC="$(mktemp)"
+    printf '%s\n' "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$TMP_NPMRC"
+    # shellcheck disable=SC2086
+    NPM_CONFIG_USERCONFIG="$TMP_NPMRC" pnpm publish $publish_args
+  else
+    # shellcheck disable=SC2086
+    pnpm publish $publish_args
   fi
-
-  # shellcheck disable=SC2086
-  NPM_CONFIG_USERCONFIG="$TMP_NPMRC" pnpm publish $publish_args
 }
 
 while [ "$#" -gt 0 ]; do
@@ -229,7 +249,7 @@ run git add CHANGELOG.md package.json
 run git commit -m "Prepare release $VERSION"
 run git tag -a "$VERSION" -m "Release $VERSION"
 
-load_release_env
+resolve_npm_credentials
 publish_to_npm
 
 CURRENT_BRANCH="$(git branch --show-current)"
