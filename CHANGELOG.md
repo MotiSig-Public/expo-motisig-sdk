@@ -8,6 +8,8 @@ when version tags are published.
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-06-25
+
 ## [1.0.1] - 2026-05-25
 
 ### Added
