@@ -6,21 +6,6 @@ export type AppPlatform = 'ios' | 'android' | 'web';
 /** Push channel keys stored server-side. */
 export type PushPlatform = 'expo' | 'fcm' | 'apns';
 
-export interface MotiSigUser {
-  id?: string;
-  projectId?: string;
-  platform?: AppPlatform;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  timezone?: string;
-  locale?: string;
-  lastSessionAt?: string;
-  accountCreatedAt?: string;
-  tags?: string[];
-  customAttributes?: Record<string, unknown>;
-}
-
 export interface RegisterUserPayload {
   id: string;
   platform?: AppPlatform;

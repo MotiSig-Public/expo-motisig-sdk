@@ -1,5 +1,4 @@
 import type {
-  MotiSigUser,
   PushSubscriptionPatchPayload,
   PushSubscriptionRemovePayload,
   PushSubscriptionUpsertPayload,
@@ -22,13 +21,6 @@ export interface TriggerEventResponse {
 /** Typed MotiSig AI REST client. */
 export class MotiSigApi {
   constructor(private readonly http: MotiSigHttpClient) {}
-
-  async getUser(userId: string): Promise<MotiSigUser | null> {
-    const res = await this.http.request<{ user?: MotiSigUser }>('GET', `/users/${encodeURIComponent(userId)}`);
-    if (res.status === 404) return null;
-    const data = this.http.assertOk(res);
-    return data.user ?? null;
-  }
 
   async registerUser(payload: RegisterUserPayload): Promise<RegisterUserResponse> {
     const res = await this.http.request<RegisterUserResponse>('POST', '/users', payload);

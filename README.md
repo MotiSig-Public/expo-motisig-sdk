@@ -37,7 +37,7 @@ await motiSig.initialize({
   // easProjectId: 'uuid', // optional if already in app.json extra.eas.projectId
 });
 
-await motiSig.setUser('user-123'); // POST /users (409 ignored), then upserts Expo push subscription
+await motiSig.setUser('user-123'); // POST /users (409 tolerated), then upserts Expo push subscription
 
 motiSig.addListener((event) => {
   if (event.type === 'foreground_notification') {
@@ -54,12 +54,11 @@ motiSig.addListener((event) => {
 |--------|-------------|
 | `initialize(options)` | Configures HTTP client; requests notification permission unless `skipPermissionRequest`; attaches listeners unless `skipNotificationListeners`; handles cold-start notification response. |
 | `getExpoPushToken()` | Returns Expo push token string or `null`. |
-| `setUser(id, extras?)` | Registers user (`POST /users`), tolerates **409**, sets local user, upserts Expo push subscription (`POST …/push-subscriptions`). |
+| `setUser(id, extras?)` | Registers user (`POST /users`, 409 tolerated), sets local user, upserts Expo push subscription (`POST …/push-subscriptions`). |
 | `logout()` | Removes push subscription for current user (`DELETE …/push-subscriptions`, best effort). |
 | `setNotificationEnabled(enabled)` | Customer flag for this device; persists (via `@react-native-async-storage/async-storage` when installed) and `PATCH`es subscription `enabled`. |
 | `updateUser`, `addTags`, `removeTags`, `addOrUpdateAttributes`, `removeAttributes`, `ping`, `triggerEvent` | User-scoped MotiSig AI routes; require `setUser` first. |
 | `trackClick(messageId, isForeground?)` | `POST /track/click`. |
-| `getUser()` | `GET /users/{id}` for current user. |
 | `addListener(fn)` | Emits `foreground_notification`, `notification_response`, `token_refresh`. |
 | `removeAllListeners()` / `reset()` | Clears listeners; `reset` also tears down native subscriptions and clears init state. |
 
@@ -141,6 +140,10 @@ pnpm example:start
 ```
 
 Output is CommonJS in `dist/` for broad React Native compatibility.
+
+## Releasing
+
+Maintainers: see **[RELEASING.md](RELEASING.md)** for the full release checklist and `scripts/release.sh` helper. Copy [`.env.release.example`](.env.release.example) to gitignored `.env.release` with your `NPM_TOKEN` before publishing.
 
 ## Source layout (`src/`)
 

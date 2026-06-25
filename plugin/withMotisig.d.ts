@@ -18,8 +18,8 @@ export interface MotiSigNsePluginProps {
   /**
    * Remove com.apple.security.application-groups from the main app + NSE entitlements.
    * Enable this when your Apple Developer account/profile does not allow App Groups
-   * (the underlying expo-notification-service-extension-plugin always adds them
-   * because it's a OneSignal-derived fork). Defaults to false.
+   * (the underlying expo-notification-service-extension-plugin always adds them). 
+   * Defaults to false.
    */
   stripAppGroups?: boolean;
 }

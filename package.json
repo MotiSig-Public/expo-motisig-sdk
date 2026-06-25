@@ -41,7 +41,8 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "prepare": "tsc",
-    "example:start": "pnpm --filter motisig-expo-example start"
+    "example:start": "pnpm --filter motisig-expo-example start",
+    "test": "vitest run"
   },
   "license": "MIT",
   "homepage": "https://motisig.ai/docs/sdks/expo",
@@ -76,6 +77,7 @@
     "expo-notifications": "~0.32.16",
     "react": "19.1.0",
     "react-native": "0.81.5",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vitest": "^3.0.9"
   }
 }

@@ -5,10 +5,12 @@ dist/
 package-lock.json
 pnpm-debug.log*
 
-# Local env files (keep .env.example tracked)
+# Local env files (keep templates tracked)
 .env
 .env.*
 !.env.example
+!.env.release.example
+.env.release
 
 # Signing / auth artifacts
 *.pem

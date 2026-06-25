@@ -38,7 +38,6 @@ export type {
   LogLevel,
   AppPlatform,
   PushPlatform,
-  MotiSigUser,
   RegisterUserPayload,
   UpdateUserPayload,
   TrackClickPayload,

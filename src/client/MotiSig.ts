@@ -17,7 +17,6 @@ import type {
   PushSubscriptionPermission,
   RegisterUserPayload,
   UpdateUserPayload,
-  MotiSigUser,
 } from '../types';
 
 type Subscription = { remove: () => void };
@@ -369,11 +368,6 @@ export class MotiSig {
       isForeground,
       userId: this.userId ?? undefined,
     });
-  }
-
-  async getUser(): Promise<MotiSigUser | null> {
-    const api = this.requireApi();
-    return api.getUser(this.requireUserId());
   }
 
   /**
